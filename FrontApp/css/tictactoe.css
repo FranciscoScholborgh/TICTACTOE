@@ -1,0 +1,15 @@
+.board_row {
+    clear: both;
+}
+.board_column {
+    border: 1px solid #000;
+    width: 150px;
+    height: 105px;
+    float: left;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.status {
+    clear: both;
+}
