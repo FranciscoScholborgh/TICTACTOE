@@ -1,0 +1,15 @@
+
+service: python-dependencies-layer
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+
+layers:
+  python-app-dependencies:
+    path: tools
+    compatibleRuntimes:
+      - python3.8
+    description: "Dependencies for tic tac toe lambda python functions"

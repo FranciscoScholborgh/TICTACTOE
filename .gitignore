@@ -1,0 +1,5 @@
+.npmignore
+.serverless
+localtest.py
+python/
+
