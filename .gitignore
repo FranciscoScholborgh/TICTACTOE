@@ -1,5 +1,11 @@
 .npmignore
 .serverless
 localtest.py
-python/
+bson/
+dns/
+dnspython-2.1.0.dist-info
+gridfs
+pymongo
+pymongo-3.11.3.dist-info
+
 

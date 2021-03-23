@@ -1,7 +1,6 @@
 
 service: python-dependencies-layer
 
-
 provider:
   name: aws
   runtime: python3.8
