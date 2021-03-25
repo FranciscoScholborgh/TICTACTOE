@@ -37,6 +37,7 @@ app.component('tictactoe', {
             username:'', player1:'', player2:'', now:'', turn: '', status: '', playing:false, token:''};
     },
     methods: {
+        // parameters => Json with data from a lambda function response from players connection
         waiting_rival: function(parameters) {
             var game_status = parameters["game_status"]
             this.restart()
@@ -44,6 +45,7 @@ app.component('tictactoe', {
             this.playing = true
             this.token = 'O'
         },
+        // parameters => Json with data from a lamdba function response from players connection
         start_game: function(parameters){
             var game_status = parameters["game_status"]
             this.restart()
@@ -57,6 +59,7 @@ app.component('tictactoe', {
                 this.token = 'X'
             }
         },
+        // parameters => Json with data from a lambda function response from spectatores connection
         spectador_join: function(parameters) {
             var game_status = parameters["game_status"]
             if (this.status === '') {
@@ -64,7 +67,7 @@ app.component('tictactoe', {
                 this.player2 = game_status["player2"]
                 this.status= game_status["status"]
                 this.turn = game_status["turn"]
-                this.now = (this.turn == 'X' ? `Waiting for ${this.player2}: X` : "It's your turn: O")
+                this.now = (this.turn == 'X' ? `Waiting for ${this.player2["username"]}: X` : "It's your turn: O")
                 this.rows[0] = game_status["board_row1"]
                 this.rows[1] = game_status["board_row2"]
                 this.rows[2] = game_status["board_row3"]
@@ -72,6 +75,7 @@ app.component('tictactoe', {
                 console.log(`The spectator ${parameters["spectator"]} has joined`)
             } 
         }, 
+        // parameters => Json with data from a lambda function response players and spectatores disconnection
         user_disconnect: function(parameters) {
             var message = ''
             if( 'player' in parameters) {
@@ -114,6 +118,7 @@ app.component('tictactoe', {
             console.log(`turn: ${this.turn}`)
             if (this.status == 'ongame' && e.target.innerText == '' && (this.token === this.turn) ) {
                 let rows = this.rows;
+                alert(`[${e.target.attributes['data-row'].value}][${e.target.attributes['data-column'].value}]`)
                 rows[e.target.attributes['data-row'].value][e.target.attributes['data-column'].value] = this.turn;
                 this.rows = rows.slice(0);
                 if (this.checkWinner()) {
@@ -144,9 +149,6 @@ app.component('tictactoe', {
         },
         checkValuesPresent: function(values) {
             return (values[0] != '' && values[1] != '' && values[2] != '');
-        },
-        checkValuesMatch: function(values) {
-            return (values[0] === values[1]) && (values[1] === values[2]);
         },
         restart: function() {
             this.rows = [ ['', '', ''], ['', '', ''], ['', '', ''] ];

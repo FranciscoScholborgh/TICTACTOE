@@ -1,5 +1,6 @@
 
 class WebSocketHandler {
+    // url => string url of the websocket connection 
     constructor(url) {
         this.socket = new WebSocket(url);
 
@@ -7,6 +8,7 @@ class WebSocketHandler {
             console.log("[open] Connection established");
         };
         
+        // event => response from websocoket close event
         this.socket.onclose = function(event) {
             console.log("went on close")
             if (event.wasClean) {
@@ -15,7 +17,8 @@ class WebSocketHandler {
                 alert('[close] Connection died');
             }
         };
-
+        
+        // event => response from websocoket error event
         this.socket.onerror = function(error) {
             alert(`[error] ${error.message}`);
         };
@@ -25,6 +28,7 @@ class WebSocketHandler {
         return this.execute_functions
     }
 
+    // execute_functions => Json with functions references to be execute on incoming message
     attach_functions(execute_functions) {
         this.socket.onmessage = function(event) {
             var data = JSON.parse(event.data);
@@ -37,6 +41,7 @@ class WebSocketHandler {
         };
     }
 
+    // message => Json object to be send 
     send_message(message) {
         this.socket.send(message)
     } 

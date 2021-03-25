@@ -21,7 +21,8 @@ def connect_event(userID:str, username:str):
         else:
             send_update(users, {"action":"WAITING_RIVAL", "response_data": status})
     except KeyError:
-        send_update(users, {"action":"SPECTATOR_JOIN", "response_data": status, "spectator":username})
+        status["spectator"] = username
+        send_update(users, {"action":"SPECTATOR_JOIN", "response_data": status})
     return _get_response(200, "connected")
 
 def send_update(users:list, message:object):
@@ -41,14 +42,15 @@ def tictactoe_handleConnections(event, context):
             return connect_event(userID, username)
         elif action == "DISCONNECT":
             is_player = db.user_isPlayer(userID)
-            player = db.get_user(userID)
+            user = db.get_user(userID)
             db.remove_user(userID)
             users = db.get_allUsers()
             if is_player is not False:
                 db.reset_game()
-                send_update(users, {"action":"PLAYER_DISCONNECT", "player":player})
+                send_update(users, {"action":"PLAYER_DISCONNECT", "response_data": {"player":user}})
             else:
-                send_update(users, {"action":"SPECTATOR_DISCONNECT", "player":player.get("username")})
+                send_update(users, {"action":"SPECTATOR_DISCONNECT", 
+                    "response_data": {"spectator":user.get("username")}})
             return _get_response(200, "disconected")
         else:
             return _get_response(500, "Something went wrong!")
