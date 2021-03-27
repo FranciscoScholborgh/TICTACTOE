@@ -1,1 +1,1 @@
-Initial graphical interface, functional tic tac toe to play locally with components made in vue
+Multiplayer Tic Tac Toe in different browsers with spectators

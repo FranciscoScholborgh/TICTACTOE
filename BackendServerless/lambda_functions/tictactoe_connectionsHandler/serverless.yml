@@ -1,0 +1,13 @@
+
+service: tictactoe-handleconnections
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+
+functions:
+  tictactoe_handleConnections:
+    handler: handler.tictactoe_handleConnections
