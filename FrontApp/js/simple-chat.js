@@ -44,7 +44,6 @@ app.component('simple-chat', {
         recieve_message: function(message) {
             var time = new Date(message["time"])
             message["time"] = time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
-            console.log(message)
             this.messages.push(message)
         },
         // this function capture an input value and send the message to a lambda function to notify the others players and spectators

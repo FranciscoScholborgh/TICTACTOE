@@ -55,4 +55,5 @@ class WebSocketHandler {
     } 
 }
 
+//define as a global variable the websocket to be used and allow the vue components to load their commads and functions to be exectued
 var tictactoe_ws = new WebSocketHandler("wss://psmhp2yn01.execute-api.us-east-1.amazonaws.com/dev", {})
