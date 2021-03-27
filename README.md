@@ -1,1 +1,1 @@
-Multiplayer Tic Tac Toe in different browsers with spectators
+Multiplayer Tic Tac Toe in different browsers and a live chat with players and spectators
