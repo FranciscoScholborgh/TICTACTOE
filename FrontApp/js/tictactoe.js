@@ -35,82 +35,101 @@ app.component('tictactoe', {
     </div>`,
     data: function() {
         return { board: [ ['', '', ''], ['', '', ''], ['', '', ''] ], updater: new WebSocketHandler("wss://psmhp2yn01.execute-api.us-east-1.amazonaws.com/dev"), 
-            username:'', player1:'', player2:'', now:'', turn: '', status: '', playing:false, token:''};
+            username:'', player1:'', player2:'', now:'', turn: '', status: '', token:''};
     },
     methods: {
+        waiting_labelMsg: function () {
+            var msg = `Waiting for ${( this.turn === 'O' ? this.player1["username"] : this.player2["username"] )}`
+            return msg
+        },
+        // game_status is a Json with the tictactoe game info, is_player is a boolean value to verify if a token must be assignend to a player 
+        load_gameBoard: function(game_status, is_player) {
+            this.status= game_status["status"]
+            this.turn = game_status["turn"]
+            this.board = game_status["board"]
+            this.player1 = game_status["player1"]
+            this.player2 = game_status["player2"]
+            if (is_player) {
+                if(this.token === '') {
+                    this.token = (this.player2 === null ? 'O' : 'X' )
+                }
+                if (game_status["new_game"] === true){
+                    console.log("You're playing now")
+                }
+            } else {
+                this.now = `Waiting for ${( this.turn == 'O' ? this.player1["username"] : this.player2["username"] )}`
+            }            
+        },
         // parameters => Json with data from a lambda function response from players connection
         waiting_rival: function(parameters) {
             var game_status = parameters["game_status"]
-            this.restart()
-            this.player1 = game_status["player1"]
-            this.playing = true
-            this.token = 'O'
+            this.load_gameBoard(game_status, true)
         },
         // parameters => Json with data from a lamdba function response from players connection
         start_game: function(parameters){
+            $(document).unbind("click");
             var game_status = parameters["game_status"]
-            this.restart()
-            this.player1 = game_status["player1"]
-            this.player2 = game_status["player2"]
-            this.status= game_status["status"]
-            this.turn = game_status["turn"]
-            this.playing = true
-            if (this.token === '') {
-                this.token = 'X'
-            }
-            this.now = (this.turn != this.token ? `Waiting for ${( this.turn === 'O' ? this.player1["username"] : this.player2["username"] )}` : "It's your turn")
+            this.load_gameBoard(game_status, true)
+            this.now = (this.turn != this.token ? this.waiting_labelMsg() : "It's your turn")            
         },
         // parameters => Json with data from a lambda function response from spectatores connection
         spectador_join: function(parameters) {
+            $(document).unbind("click");
             var game_status = parameters["game_status"]
-            if (this.status === '') {
-                this.player1 = game_status["player1"]
-                this.player2 = game_status["player2"]
-                this.status= game_status["status"]
-                this.turn = game_status["turn"]
-                this.now = `Waiting for ${( this.turn == 'O' ? this.player1["username"] : this.player2["username"] )}`
-                this.board = game_status["board"]
-            } else {
+            if (game_status["new_game"] === true) {
+                this.load_gameBoard(game_status, false)
+                console.log("Otros juegan")
+            } else if (this.status === '') {
+                this.load_gameBoard(game_status, false)
+                console.log("You've joined as a spectator")
+            }
+            else {
                 console.log(`The spectator ${parameters["spectator"]} has joined`)
-            } 
+            }  
         }, 
         // parameters => Json with data from a lambda function response players and spectatores disconnection
         user_disconnect: function(parameters) {
             var message = ''
             if( 'player' in parameters) {
-                var user_id = parameters["player"]["_id"]
-                if(this.playing) {
+                is_player = (this.token != '')
+                this.status = (is_player ? 'win' : 'spectator' )
+                if(is_player) {
                     message = "You won!"
                 } else {
-                    if(user_id === this.player1["_id"]) {
+                    if(parameters["player"]["_id"] === this.player1["_id"]) {
                         message = `Player ${this.player1["username"]} has disconneted, Player ${this.player2["username"]} wins`
                     } else {
                         message = `Player ${this.player2["username"]} has disconneted, Player ${this.player1["username"]} wins`
                     }
                 }
+                console.log(message)
+                this.click_toplay()
             } else {
-                var spectator = parameters["spectator"]
-                message = `The spectator ${spectator} has disconneted`
+                message = `The spectator ${parameters["spectator"]} has disconneted`
+                console.log(message)
             }
-            console.log(message)
         },
+         // parameters => Json with data from a lambda function response that updates the game
         changeTurn: function(parameters) {
             this.board = parameters["board"]
             this.turn = parameters["turn"]
-            if(this.playing) {
-                this.now = (this.turn != this.token ? `Waiting for ${( this.turn === 'O' ? this.player1["username"] : this.player2["username"] )}` : "It's your turn")
+            if(this.token != '') {
+                this.now = (this.turn != this.token ? this.waiting_labelMsg() : "It's your turn")
             } else {
-                this.now = `Waiting for ${( this.turn === 'O' ? this.player1["username"] : this.player2["username"] )}`
+                this.now = this.waiting_labelMsg()
             }
         },
+         // parameters => Json with data from a lambda function response that notify a tie
         result_draw: function(parameters) {
             this.board = parameters["board"]
             this.status = 'draw'
-            alert("Prepare to play")
+            this.click_toplay() //prepare to play
         },
+        // parameters => Json with data from a lambda function response that notify the winner
         check_winner: function(parameters) {
             this.board = parameters["board"]
-            this.status = (this.playing ? (this.turn == this.token ? 'win' : 'lose') : 'spectator')
+            this.status = (this.token != '' ? (this.turn == this.token ? 'win' : 'lose') : 'spectator')
+            this.click_toplay() //prepare to play
         },
         register: function() {
             if (this.username === ''){
@@ -127,7 +146,7 @@ app.component('tictactoe', {
                     "RESULT_WIN": this.check_winner
                 }
                 this.updater.attach_functions(functions_toexecute)
-                send = {"action":"register", "username":this.username}
+                var send = {"action":"register", "username":this.username}
                 this.updater.send_message(JSON.stringify(send))
                 $("#usernameModal").modal('toggle')                
             }
@@ -142,7 +161,16 @@ app.component('tictactoe', {
         },
         restart: function() {
             this.board = [ ['', '', ''], ['', '', ''], ['', '', ''] ];
-            this.player1=''; this.player2=''; this.now='', this.turn= ''; this.status= ''; this.playing = false;
+            this.player1=''; this.player2=''; this.now='', this.turn= ''; this.status= '';
         },
+        new_game: function() {
+            this.restart()
+            $(document).unbind("click");
+            var send = {"action":"register", "username":this.username}
+            this.updater.send_message(JSON.stringify(send))
+        }, click_toplay: function() {
+            this.token='';
+            $(document).click(this.new_game)
+        }
     }
 });
