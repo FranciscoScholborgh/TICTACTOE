@@ -1,8 +1,9 @@
 
 class WebSocketHandler {
     // url => string url of the websocket connection 
-    constructor(url) {
+    constructor(url, executables) {
         this.socket = new WebSocket(url);
+        this.execute_functions = executables
 
         this.socket.onopen = function() {
             console.log("[open] Connection established");
@@ -29,12 +30,18 @@ class WebSocketHandler {
     }
 
     // execute_functions => Json with functions references to be execute on incoming message
-    attach_functions(execute_functions) {
+    attach_functions(executables) {
+        var run_functions = this.execute_functions
+        Object.keys(run_functions).forEach(function(function_name) {
+            var to_execute = run_functions[function_name];
+            executables[function_name]= to_execute
+        });
+        this.execute_functions = executables
         this.socket.onmessage = function(event) {
             var data = JSON.parse(event.data);
             var action = data["action"]
             try {
-                execute_functions[action](data["response_data"])
+                executables[action](data["response_data"])
             } catch(TypeError) {
                 
             }           
@@ -46,3 +53,5 @@ class WebSocketHandler {
         this.socket.send(message)
     } 
 }
+
+var tictactoe_ws = new WebSocketHandler("wss://psmhp2yn01.execute-api.us-east-1.amazonaws.com/dev", {})

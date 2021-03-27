@@ -1,5 +1,6 @@
 import json
 import boto3
+import copy
 from utils.database import SimpleChatDB
 
 apiUrl = "https://psmhp2yn01.execute-api.us-east-1.amazonaws.com/dev"
@@ -25,8 +26,12 @@ def simple_chat(event, context):
     body = json.loads(event.get("body"))
     request = body.get("request")
     chat = db.load_chat()
+    for message in chat:
+        del message['_id']
     if request == "LOAD_CHAT":
-        response = {"action":"LOAD_CHAT", "response_data": chat}
+        userID = event["requestContext"].get("connectionId")
+        username = db.get_user(userID).get("username") if db.get_user(userID) is not None else None
+        response = {"action":"LOAD_CHAT", "response_data": chat, "username": username}
         return _get_response (200, response)
     elif request == "SEND_MESSAGE":
         username = body.get("username")
@@ -35,7 +40,7 @@ def simple_chat(event, context):
         db.send_message(username, message, time)
         update_message = {"username":username, "message":message, "time":time}
         response = {"action":"UPDATE_CHAT", "response_data": update_message}
-        users = db.get_users()
+        users = list(db.get_users())
         send_update(users, response)
         return _get_response (200, 'message sent!')
     else:

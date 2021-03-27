@@ -48,9 +48,10 @@ def connect_event(userID:str, username:str):
         send_update(users, {"action":"SPECTATOR_JOIN", "response_data": response})
     return _get_response(200, "connected")
 
-def connection_queue(event, context):
+def lambda_handler(event, context):
     records = event.get("Records")[0]
     body = json.loads(records.get("body")) 
     userID = body.get("playerID")
     username = body.get("username")
     return connect_event(userID, username)
+    
