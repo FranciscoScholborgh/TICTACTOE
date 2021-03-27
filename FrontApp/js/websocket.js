@@ -1,6 +1,7 @@
-
+//Define the class to handle the websocket conection 
 class WebSocketHandler {
     // url => string url of the websocket connection 
+    //exectuables => Json with commands as keys and functions as values to be executed when the socket recieve a message
     constructor(url, executables) {
         this.socket = new WebSocket(url);
         this.execute_functions = executables
@@ -54,4 +55,5 @@ class WebSocketHandler {
     } 
 }
 
+//define as a global variable the websocket to be used and allow the vue components to load their commads and functions to be exectued
 var tictactoe_ws = new WebSocketHandler("wss://psmhp2yn01.execute-api.us-east-1.amazonaws.com/dev", {})

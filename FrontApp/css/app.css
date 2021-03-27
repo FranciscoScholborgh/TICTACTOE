@@ -1,7 +1,46 @@
 html, body {
     height: 100%;
+    font-weight: 900;
+    font-family: sans-serif;
+    height: 100vh;
+    margin: 0;
+}
+
+.black_moon {
+    background: #141E30;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color: #fff;
+}
+
+.light_moon {
+    background: #FFEFBA !important;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #FFFFFF, #FFEFBA) !important;  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #FFFFFF, #FFEFBA) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color: #000 !important;;
+}
+
+.button {
+    background-color: #141E30; 
+    border: none;
+    color: aliceblue;
+    padding: 5px 25px;
+    text-align: center;
+    font-size: 16px;
+    margin: 2px 1px;
+    opacity: 0.8;
+    transition: 0.3s;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
 }
   
+.button:hover {opacity: 1}
+
+h1,h2,h3,h4,h5 {
+    color:aliceblue;
+}
+ 
 .full-height {
     height: 100%;
 }

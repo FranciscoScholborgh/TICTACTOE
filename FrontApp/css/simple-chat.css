@@ -1,7 +1,8 @@
 .chat_username {
     font-size: 12px;
     font-weight: bold;
-    line-height: 20px;
+    line-height: 10px;
+    color: #333333;
 }
 
 .chat_message {
@@ -14,9 +15,9 @@
 
 .chat_time {
     font-size: 10px;
-    line-height: 16px;
+    line-height: 8px;
     position: relative;
-    padding-bottom: 1px;
+    padding-bottom: 16px;
     color: #333333;
 }
 
