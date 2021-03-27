@@ -1,6 +1,7 @@
-
+//Define the class to handle the websocket conection 
 class WebSocketHandler {
     // url => string url of the websocket connection 
+    //exectuables => Json with commands as keys and functions as values to be executed when the socket recieve a message
     constructor(url, executables) {
         this.socket = new WebSocket(url);
         this.execute_functions = executables
