@@ -1,4 +1,3 @@
-
 import json
 import boto3
 import logging
@@ -23,18 +22,30 @@ def send_update(users:list, message:object):
             client.post_to_connection(ConnectionId=id, Data=json.dumps(message))
         except:
             pass
-
+        
 def connect_event(userID:str, username:str):
-    status = db.register_player(userID, username)
+    response = db.register_player(userID, username)
     users = db.get_allUsers()
     try:
-        if status["ready_toplay"]:
-            send_update(users, {"action":"START_GAME", "response_data": status})
+        game_status = response.get("game_status")
+        players = [game_status.get("player1")]
+        if response["ready_toplay"]:
+            players.append(game_status.get("player2"))
+            send_update(players, {"action":"START_GAME", "response_data": response})
+            player1_id = game_status.get("player1").get("_id")
+            player2_id = game_status.get("player2").get("_id")
+            spectators = []
+            for user in users:
+                user_id = user.get("_id")
+                if user_id != player1_id and user_id != player2_id:
+                    spectators.append(user)
+            response[""] = True
+            send_update(spectators, {"action":"SPECTATOR_JOIN", "response_data": response})
         else:
-            send_update(users, {"action":"WAITING_RIVAL", "response_data": status})
+            send_update(players, {"action":"WAITING_RIVAL", "response_data": response})
     except KeyError:
-        status["spectator"] = username
-        send_update(users, {"action":"SPECTATOR_JOIN", "response_data": status})
+        response["spectator"] = username
+        send_update(users, {"action":"SPECTATOR_JOIN", "response_data": response})
     return _get_response(200, "connected")
 
 def connection_queue(event, context):
