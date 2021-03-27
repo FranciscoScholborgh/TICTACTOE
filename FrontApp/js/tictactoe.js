@@ -34,8 +34,7 @@ app.component('tictactoe', {
         </div>
     </div>`,
     data: function() {
-        return { board: [ ['', '', ''], ['', '', ''], ['', '', ''] ], updater: new WebSocketHandler("wss://psmhp2yn01.execute-api.us-east-1.amazonaws.com/dev"), 
-            username:'', player1:'', player2:'', now:'', turn: '', status: '', token:''};
+        return { board: [ ['', '', ''], ['', '', ''], ['', '', ''] ], updater: tictactoe_ws, username:'', player1:'', player2:'', now:'', turn: '', status: '', token:''};
     },
     methods: {
         waiting_labelMsg: function () {
@@ -135,6 +134,7 @@ app.component('tictactoe', {
             if (this.username === ''){
                 alert("Enter your username, please")
             } else {
+                $("#username").val(this.username) 
                 var functions_toexecute = {
                     "WAITING_RIVAL": this.waiting_rival,
                     "START_GAME" : this.start_game,
@@ -155,7 +155,7 @@ app.component('tictactoe', {
             if (this.status == 'ongame' && e.target.innerText == '' && (this.token === this.turn) ) {
                 var row = e.target.attributes['data-row'].value
                 var column = e.target.attributes['data-column'].value
-                send = {"action":"gameUpdate", "row":row, "column":column, "token":this.token}
+                var send = {"action":"gameUpdate", "row":row, "column":column, "token":this.token}
                 this.updater.send_message(JSON.stringify(send))
             }
         },
